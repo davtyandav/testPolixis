@@ -20,7 +20,6 @@ public class NoteConvertor {
 
     public Note convertToModel(NoteDto noteDto) {
         Note note = new Note();
-        note.setId(noteDto.getId());
         note.setNote(noteDto.getNote());
         note.setCreate(noteDto.getCreate());
         note.setUpdateTime(noteDto.getUpdateTime());

@@ -1,21 +1,22 @@
 package com.davtyandav.testPolixis.service;
 
 
-import com.davtyandav.testPolixis.dto.NoteDto;
+import com.davtyandav.testPolixis.model.Note;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface NoteService {
 
-    NoteDto getNote(String id);
+    Optional<Note> getNote(String id);
 
-    void addNote(NoteDto note);
+    void addNote(Note note);
 
-    List<NoteDto> getNotes();
+    List<Note> getNotes();
 
-    void delete(String id);
+    void delete(Note Note);
 
-    NoteDto update(NoteDto noteDto);
+    Note update(Note noteDto);
 
 }
