@@ -14,4 +14,8 @@ public interface NoteService {
 
     List<NoteDto> getNotes();
 
+    void delete(String id);
+
+    NoteDto update(NoteDto noteDto);
+
 }
