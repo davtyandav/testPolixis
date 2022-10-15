@@ -1,10 +1,13 @@
 package com.davtyandav.testPolixis.dto;
 
+import com.davtyandav.testPolixis.model.Note;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,4 +18,5 @@ public class UserDto {
     private String email;
     private String password;
     private Date create;
+    private List<NoteDto> notes = new ArrayList<>();
 }

@@ -18,15 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1/notes")
 public class NoteController {
 
-    private Logger logger = LoggerFactory.getLogger(NoteController.class);
-    
+    private static final Logger logger = LoggerFactory.getLogger(NoteController.class);
+
     private final NoteService noteService;
 
     private final NoteConvertor noteConvertor;
@@ -37,49 +36,41 @@ public class NoteController {
     }
 
     @GetMapping()
-    public List<NoteDto> getUsers() {
+    public List<NoteDto> getNotes() {
         return noteService.getNotes().stream().map(noteConvertor::convertToDto).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<NoteDto> getNodeById(@PathVariable String id) {
-        Optional<Note> note = noteService.getNote(id);
-        if (note.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            NoteDto noteDto = noteConvertor.convertToDto(note.get());
-            return new ResponseEntity<>(noteDto, HttpStatus.OK);
-        }
+        return noteService.getNote(id)
+                .map(noteConvertor::convertToDto)
+                .map(noteDto -> new ResponseEntity<>(noteDto, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping()
-    public void addNote(@RequestBody NoteDto noteDto) {
+    public ResponseEntity<?> addNote(@RequestBody NoteDto noteDto) {
         Note note = noteConvertor.convertToModel(noteDto);
         noteService.addNote(note);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping()
-    public ResponseEntity<NoteDto> updateNote(@RequestBody NoteDto noteDto) {
-        Optional<Note> note = noteService.getNote(noteDto.getId());
-        if (note.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            Note update = noteService.update(note.get());
-            NoteDto updateDto = noteConvertor.convertToDto(update);
-            return new ResponseEntity<>(updateDto, HttpStatus.OK);
+    public ResponseEntity<?> updateNote(@RequestBody NoteDto noteDto) {
+        Note note = noteConvertor.convertToModel(noteDto);
+        boolean update = noteService.update(note);
+        if (update) {
+            return new ResponseEntity<>(HttpStatus.OK);
         }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<NoteDto> delete(@PathVariable String id) {
-        Optional<Note> note = noteService.getNote(id);
-        if (note.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            Note deleteNote = note.get();
-            noteService.delete(deleteNote);
-            NoteDto noteDto = noteConvertor.convertToDto(deleteNote);
-            return new ResponseEntity<>(noteDto, HttpStatus.OK);
+    public ResponseEntity<?> delete(@PathVariable String id) {
+        boolean delete = noteService.delete(id);
+        if (delete) {
+            return new ResponseEntity<>(HttpStatus.OK);
         }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

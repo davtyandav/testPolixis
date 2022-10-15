@@ -11,11 +11,11 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class UserServiceImpl implements NoteService {
+public class NoteServiceImpl implements NoteService {
 
     private final NoteRepository noteRepository;
 
-    public UserServiceImpl(NoteRepository noteRepository) {
+    public NoteServiceImpl(NoteRepository noteRepository) {
         this.noteRepository = noteRepository;
     }
 
@@ -35,12 +35,20 @@ public class UserServiceImpl implements NoteService {
     }
 
     @Override
-    public void delete(Note note) {
-        noteRepository.delete(note);
+    public boolean delete(String id) {
+        boolean exists = noteRepository.existsById(id);
+        if (exists) {
+            noteRepository.deleteById(id);
+        }
+        return exists;
     }
 
     @Override
-    public Note update(Note note) {
-        return noteRepository.save(note);
+    public boolean update(Note note) {
+        boolean exists = noteRepository.existsById(note.getId());
+        if (exists) {
+            noteRepository.save(note);
+        }
+        return exists;
     }
 }

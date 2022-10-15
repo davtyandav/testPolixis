@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+
 @Document
 @Getter
 @Setter
@@ -19,5 +20,4 @@ public class Note {
     private String note;
     private Date create;
     private Date updateTime;
-
 }
