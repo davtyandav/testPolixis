@@ -1,7 +1,9 @@
 package com.davtyandav.testPolixis.controller;
 
+import com.davtyandav.testPolixis.UserNotFoundException;
 import com.davtyandav.testPolixis.convertor.NoteConvertor;
 import com.davtyandav.testPolixis.dto.NoteDto;
+import com.davtyandav.testPolixis.dto.UpdateNoteDto;
 import com.davtyandav.testPolixis.model.Note;
 import com.davtyandav.testPolixis.service.NoteService;
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -49,15 +52,19 @@ public class NoteController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> addNote(@RequestBody NoteDto noteDto) {
+    public ResponseEntity<?> addNote(@RequestParam String userId, @RequestBody NoteDto noteDto) {
         Note note = noteConvertor.convertToModel(noteDto);
-        noteService.addNote(note);
+        try {
+            noteService.addNote(note, userId);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping()
-    public ResponseEntity<?> updateNote(@RequestBody NoteDto noteDto) {
-        Note note = noteConvertor.convertToModel(noteDto);
+    public ResponseEntity<?> updateNote(@RequestBody UpdateNoteDto updateNoteDto) {
+        Note note = noteConvertor.convertToModel(updateNoteDto);
         boolean update = noteService.update(note);
         if (update) {
             return new ResponseEntity<>(HttpStatus.OK);

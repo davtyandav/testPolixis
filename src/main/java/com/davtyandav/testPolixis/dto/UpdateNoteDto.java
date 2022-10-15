@@ -1,22 +1,22 @@
-package com.davtyandav.testPolixis.model;
+package com.davtyandav.testPolixis.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
-@Document
 @Getter
 @Setter
 @NoArgsConstructor
-public class Note {
+public class UpdateNoteDto {
 
-    @Id
-    private String id;
+    @NotBlank(message = "Title may not be blank")
     private String title;
+
+    @Max(value = 512)
     private String note;
     private Date create;
     private Date updateTime;

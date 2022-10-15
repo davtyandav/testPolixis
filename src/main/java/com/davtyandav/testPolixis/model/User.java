@@ -20,5 +20,4 @@ public class User {
     private String email;
     private String password;
     private Date create;
-    private List<Note> notes = new ArrayList<>();
 }

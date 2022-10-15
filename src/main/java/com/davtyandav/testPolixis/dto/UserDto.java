@@ -18,5 +18,5 @@ public class UserDto {
     private String email;
     private String password;
     private Date create;
-    private List<NoteDto> notes = new ArrayList<>();
+
 }

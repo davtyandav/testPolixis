@@ -22,4 +22,5 @@ public class NoteDto {
     private String note;
     private Date create;
     private Date updateTime;
+    private String userId;
 }

@@ -2,6 +2,7 @@ package com.davtyandav.testPolixis.convertor;
 
 
 import com.davtyandav.testPolixis.dto.NoteDto;
+import com.davtyandav.testPolixis.dto.UpdateNoteDto;
 import com.davtyandav.testPolixis.model.Note;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ public class NoteConvertor {
         noteDto.setCreate(note.getCreate());
         noteDto.setUpdateTime(note.getUpdateTime());
         noteDto.setTitle(note.getTitle());
+        noteDto.setUserId(note.getUserId());
         return noteDto;
     }
 
@@ -25,6 +27,17 @@ public class NoteConvertor {
         note.setCreate(noteDto.getCreate());
         note.setUpdateTime(noteDto.getUpdateTime());
         note.setTitle(noteDto.getTitle());
+        note.setUserId(noteDto.getUserId());
+        return note;
+    }
+
+    public Note convertToModel(UpdateNoteDto noteDto) {
+        Note note = new Note();
+        note.setNote(noteDto.getNote());
+        note.setCreate(noteDto.getCreate());
+        note.setUpdateTime(noteDto.getUpdateTime());
+        note.setTitle(noteDto.getTitle());
+        note.setUserId(noteDto.getUserId());
         return note;
     }
 }
