@@ -17,6 +17,6 @@ public interface NoteService {
 
     void delete(String id, String userId);
 
-    void update(Note noteDto,String userId);
+    void update(Note note,String userId);
 
 }
