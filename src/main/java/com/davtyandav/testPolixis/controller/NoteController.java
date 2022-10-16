@@ -5,7 +5,6 @@ import com.davtyandav.testPolixis.exception.NoteNotFoundException;
 import com.davtyandav.testPolixis.exception.UserNotFoundException;
 import com.davtyandav.testPolixis.convertor.NoteConvertor;
 import com.davtyandav.testPolixis.dto.NoteDto;
-import com.davtyandav.testPolixis.dto.UpdateNoteDto;
 import com.davtyandav.testPolixis.model.Note;
 import com.davtyandav.testPolixis.service.NoteService;
 import org.slf4j.Logger;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 @RequestMapping("api/v1")
 public class NoteController {
 
-    private static final Logger logger = LoggerFactory.getLogger(NoteController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NoteController.class);
 
     private final NoteService noteService;
 
@@ -66,32 +65,37 @@ public class NoteController {
         try {
             noteService.addNote(note, userId);
         } catch (UserNotFoundException e) {
+            LOGGER.error("Error has occurred during getting user: UserId = " + userId);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping()
-    public ResponseEntity<?> updateNote(@RequestParam String userId, @RequestBody @Valid UpdateNoteDto updateNoteDto) {
+    public ResponseEntity<?> updateNote(@RequestParam String userId, @RequestBody @Valid NoteDto updateNoteDto) {
         Note note = noteConvertor.convertToModel(updateNoteDto);
         try {
             noteService.update(note, userId);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (NoteNotFoundException e) {
+            LOGGER.error("Error has occurred during getting note: NoteId = " + updateNoteDto.getId());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NotAccessException e) {
+            LOGGER.error("Error has occurred during checking access user to note. UserId: " + userId);
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 
-    @DeleteMapping("/users/{id}/notes/{noteId}")
-    public ResponseEntity<?> delete(@PathVariable String id, @PathVariable String noteId) {
+    @DeleteMapping("/users/{userId}/notes/{noteId}")
+    public ResponseEntity<?> delete(@PathVariable String userId, @PathVariable String noteId) {
         try {
-            noteService.delete(noteId, id);
+            noteService.delete(noteId, userId);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (NoteNotFoundException e) {
+            LOGGER.error("Error has occurred during getting note: NoteId = " + noteId);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NotAccessException e) {
+            LOGGER.error("Error has occurred during checking access user to note. UserId: " + userId);
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
