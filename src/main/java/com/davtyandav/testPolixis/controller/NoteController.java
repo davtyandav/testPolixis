@@ -1,6 +1,8 @@
 package com.davtyandav.testPolixis.controller;
 
-import com.davtyandav.testPolixis.UserNotFoundException;
+import com.davtyandav.testPolixis.exception.NotAccessException;
+import com.davtyandav.testPolixis.exception.NoteNotFoundException;
+import com.davtyandav.testPolixis.exception.UserNotFoundException;
 import com.davtyandav.testPolixis.convertor.NoteConvertor;
 import com.davtyandav.testPolixis.dto.NoteDto;
 import com.davtyandav.testPolixis.dto.UpdateNoteDto;
@@ -20,11 +22,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/v1/notes")
+@RequestMapping("api/v1")
 public class NoteController {
 
     private static final Logger logger = LoggerFactory.getLogger(NoteController.class);
@@ -38,12 +41,18 @@ public class NoteController {
         this.noteConvertor = noteConvertor;
     }
 
-    @GetMapping()
-    public List<NoteDto> getNotes() {
-        return noteService.getNotes().stream().map(noteConvertor::convertToDto).collect(Collectors.toList());
+    @GetMapping("/users/{userId}/notes")
+    public ResponseEntity<List<NoteDto>> getNotes(@PathVariable String userId) {
+        try {
+            List<NoteDto> notes = noteService.getNotes(userId).stream()
+                    .map(noteConvertor::convertToDto).collect(Collectors.toList());
+            return new ResponseEntity<>(notes, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("notes/{id}")
     public ResponseEntity<NoteDto> getNodeById(@PathVariable String id) {
         return noteService.getNote(id)
                 .map(noteConvertor::convertToDto)
@@ -51,8 +60,8 @@ public class NoteController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping()
-    public ResponseEntity<?> addNote(@RequestParam String userId, @RequestBody NoteDto noteDto) {
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<?> addNote(@PathVariable String userId, @RequestBody @Valid NoteDto noteDto) {
         Note note = noteConvertor.convertToModel(noteDto);
         try {
             noteService.addNote(note, userId);
@@ -63,21 +72,27 @@ public class NoteController {
     }
 
     @PutMapping()
-    public ResponseEntity<?> updateNote(@RequestBody UpdateNoteDto updateNoteDto) {
+    public ResponseEntity<?> updateNote(@RequestParam String userId, @RequestBody @Valid UpdateNoteDto updateNoteDto) {
         Note note = noteConvertor.convertToModel(updateNoteDto);
-        boolean update = noteService.update(note);
-        if (update) {
+        try {
+            noteService.update(note, userId);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NoteNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (NotAccessException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
-        boolean delete = noteService.delete(id);
-        if (delete) {
+    @DeleteMapping("/users/{id}/notes/{noteId}")
+    public ResponseEntity<?> delete(@PathVariable String id, @PathVariable String noteId) {
+        try {
+            noteService.delete(noteId, id);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NoteNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (NotAccessException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

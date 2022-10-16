@@ -1,13 +1,13 @@
 package com.davtyandav.testPolixis.dto;
 
-import com.davtyandav.testPolixis.model.Note;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -15,7 +15,12 @@ import java.util.List;
 public class UserDto {
 
     private String id;
+
+    @Email
     private String email;
+
+    @NotBlank(message = "Password may not be blank")
+    @Size(min = 8)
     private String password;
     private Date create;
 

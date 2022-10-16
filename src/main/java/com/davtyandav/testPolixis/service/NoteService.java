@@ -1,7 +1,9 @@
 package com.davtyandav.testPolixis.service;
 
 
-import com.davtyandav.testPolixis.UserNotFoundException;
+import com.davtyandav.testPolixis.exception.NotAccessException;
+import com.davtyandav.testPolixis.exception.NoteNotFoundException;
+import com.davtyandav.testPolixis.exception.UserNotFoundException;
 import com.davtyandav.testPolixis.model.Note;
 
 import java.util.List;
@@ -14,12 +16,10 @@ public interface NoteService {
 
     void addNote(Note note, String userId) throws UserNotFoundException;
 
-    List<Note> getNotes();
+    List<Note> getNotes(String userId) throws UserNotFoundException;
 
-    boolean delete(String id);
+    void delete(String id, String userId) throws NoteNotFoundException, NotAccessException;
 
-    boolean update(Note noteDto);
-
-    List<Note> findNotesByUserId(String userId);
+    void update(Note noteDto,String userId) throws NoteNotFoundException, NotAccessException;
 
 }

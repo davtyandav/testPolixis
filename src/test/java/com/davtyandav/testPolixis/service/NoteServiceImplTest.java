@@ -1,42 +1,76 @@
 package com.davtyandav.testPolixis.service;
 
+import com.davtyandav.testPolixis.controller.NoteController;
+import com.davtyandav.testPolixis.exception.UserNotFoundException;
 import com.davtyandav.testPolixis.model.Note;
 import com.davtyandav.testPolixis.model.User;
 import com.davtyandav.testPolixis.repository.NoteRepository;
 import com.davtyandav.testPolixis.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class NoteServiceImplTest {
+
 
     @Mock
     private NoteRepository noteRepository;
     @Mock
     private UserRepository userRepository;
 
+    @Autowired
+    private NoteController noteController;
+
     @Test
     void getNote() {
-        UserService userService =new UserServiceImpl(userRepository);
+        NoteService noteService = new NoteServiceImpl(noteRepository, userRepository);
+        User user = getUser();
+        Note note = getNote(user);
+        Optional<User> userOptional = Optional.of(user);
+        when(userRepository.findById("1")).thenReturn(userOptional);
+        Optional<Note> noteOptional = Optional.of(note);
+        when(noteRepository.findById("1")).thenReturn(noteOptional);
+
+        Note note1 = noteService.getNote("1").get();
+        assertEquals(note, note1);
+    }
+
+    @Test
+    void addNote() throws UserNotFoundException {
         NoteService service = new NoteServiceImpl(noteRepository, userRepository);
         User user = getUser();
         Note note = getNote(user);
         Optional<User> userOptional = Optional.of(user);
-        when(userService.getUser("1")).thenReturn(userOptional);
+        when(userRepository.findById("1")).thenReturn(userOptional);
         Optional<Note> noteOptional = Optional.of(note);
-        when(service.getNote("1")).thenReturn(noteOptional);
+        when(noteRepository.findById("1")).thenReturn(noteOptional);
+        service.addNote(note, user.getId());
+
     }
 
+
     @Test
-    void addNote() {
+    void noteValidation() {
+        Note note = new Note();
+        note.setTitle("dsa");
+
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set violations = validator.validate(note);
+        assertFalse(violations.isEmpty());
     }
+
 
     @Test
     void getNotes() {
@@ -56,7 +90,7 @@ class NoteServiceImplTest {
         note.setId("1");
         note.setNote("note");
         note.setTitle("title");
-        note.setUser(user);
+        note.setUserId(user.getId());
         note.setUpdateTime(new Date());
         note.setCreate(new Date());
         return note;

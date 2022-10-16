@@ -1,4 +1,4 @@
-package com.davtyandav.testPolixis;
+package com.davtyandav.testPolixis.exception;
 
 public class UserNotFoundException extends Exception {
     public UserNotFoundException() {
