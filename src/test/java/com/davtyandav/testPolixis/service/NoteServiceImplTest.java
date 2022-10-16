@@ -1,14 +1,11 @@
 package com.davtyandav.testPolixis.service;
 
-import com.davtyandav.testPolixis.controller.NoteController;
-import com.davtyandav.testPolixis.exception.UserNotFoundException;
 import com.davtyandav.testPolixis.model.Note;
 import com.davtyandav.testPolixis.model.User;
 import com.davtyandav.testPolixis.repository.NoteRepository;
 import com.davtyandav.testPolixis.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.validation.Validation;
@@ -24,14 +21,10 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class NoteServiceImplTest {
 
-
     @Mock
     private NoteRepository noteRepository;
     @Mock
     private UserRepository userRepository;
-
-    @Autowired
-    private NoteController noteController;
 
     @Test
     void getNote() {
@@ -48,7 +41,7 @@ class NoteServiceImplTest {
     }
 
     @Test
-    void addNote() throws UserNotFoundException {
+    void addNote() {
         NoteService service = new NoteServiceImpl(noteRepository, userRepository);
         User user = getUser();
         Note note = getNote(user);
